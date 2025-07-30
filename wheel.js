@@ -38,7 +38,16 @@ function initWheel() {
   });
 
   document.getElementById('spin')
-          .addEventListener('click', () => theWheel.startAnimation());
+  .addEventListener('click', () => {
+    // 1) もしアニメーション中なら停止
+    theWheel.stopAnimation(false);
+    // 2) ホイールの回転角度をゼロにリセット
+    theWheel.rotationAngle = 0;
+    // 3) 再描画（キャンバスをクリアして初期状態を描画）
+    theWheel.draw();
+    // 4) 改めてスピン開始
+    theWheel.startAnimation();
+  });
 }
 
 /* ★ リサイズ時に再フィット */
