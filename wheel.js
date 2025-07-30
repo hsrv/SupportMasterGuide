@@ -5,8 +5,6 @@ let theWheel;
 /* ★ 端末サイズに合わせてキャンバスを設定する関数 */
  function fitCanvas() {
    const canvas = document.getElementById('canvas');
-
-// 新: レイアウト後の実際の幅をそのまま取得
    const size = canvas.getBoundingClientRect().width;
 
    // Canvas の内部解像度も同じ値に
