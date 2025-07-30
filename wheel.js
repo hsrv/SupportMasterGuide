@@ -58,7 +58,7 @@ function initWheel() {
 	theWheel.draw();
 	theWheel.startAnimation();
 	});
-	
+}
 
 /* ★ リサイズ時に再フィット */
 window.addEventListener('resize', fitCanvas);
