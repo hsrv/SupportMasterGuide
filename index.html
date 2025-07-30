@@ -1,78 +1,110 @@
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>ルーレット</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/2.1.3/TweenMax.min.js"></script>
-  <script src="Winwheel.min.js"></script>
-  <style>
-    :root {
-      --wheel-max: 400px;
-      --wheel-size: min(var(--wheel-max), 90vw);
+// ① クリップを読み込む
+let clips = [];
+let theWheel;
+
+/* ★ 端末サイズに合わせてキャンバスを設定する関数 */
+function fitCanvas() {
+  const canvas = document.getElementById('canvas');
+  const size   = canvas.getBoundingClientRect().width;
+  canvas.width  = size;
+  canvas.height = size;
+
+  if (theWheel) {
+    theWheel.outerRadius = size / 2 - 10;
+    theWheel.draw();
+  }
+}
+
+function randomPastelColor() {
+  const hue        = Math.floor(Math.random() * 360);  // 0–359°
+  const saturation = 70;                               // 彩度 70%
+  const lightness  = 85;                               // 明度 85% → パステル
+  return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+}
+
+function initWheel() {
+  fitCanvas();
+
+  // ランダムパステルでセグメント配列を再作成
+  const segments = clips.map(c => ({
+    text:           c.label,
+    fillStyle:      randomPastelColor(),
+    textFillStyle:  '#333'
+  }));
+
+  // キャンバスをクリア
+  const canvas = document.getElementById('canvas');
+  canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+
+  // 新しい Winwheel インスタンス
+  theWheel = new Winwheel({
+    canvasId:    'canvas',
+    numSegments: segments.length,
+    segments:    segments,
+    outerRadius: canvas.width / 2 - 10,
+    textMargin:  0,
+    animation: {
+      type:             'spinToStop',
+      duration:         6,
+      spins:            8,
+      callbackFinished: seg => playClip(seg.text)
     }
-    body {
-      margin: 0; padding: 0 1rem;
-      background: #222; color: #fff;
-      text-align: center; font-family: system-ui, sans-serif;
-    }
+  });
 
-    /* ↓ 古い #canvas {…} は完全に削除 or コメントアウト */
+  // 最初に一度描画
+  theWheel.draw();
 
-    /* ① ルーレットを包むラッパー */
-    #wheel-container {
-      position: relative;
-      width: var(--wheel-size);
-      height: var(--wheel-size);
-      margin: 0 auto;
-      overflow: visible;
-    }
+  // スピンボタン
+  document.getElementById('spin').addEventListener('click', () => {
+  // 1. 既存アニメーションを止める（コールバックは呼ばない）
+  theWheel.stopAnimation(false);
 
-    /* ② ラッパー内の canvas */
-    #wheel-container canvas {
-      width: 100%;
-      height: 100%;
-      background: #444;
-      border-radius: 50%;
-      display: block;
-    }
+  // 2. 現在の角度を 0–360° に正規化（mod 360）してセット
+  //    これで次回 startAnimation() は 0–360° のどこかからスタート
+  theWheel.rotationAngle = theWheel.rotationAngle % 360;
 
-    /* ③ 矢印（下向き） */
-    #pointer {
-      position: absolute;
-      z-index: 10;
-      bottom: -20px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 0; height: 0;
-      border-left: 15px solid transparent;
-      border-right: 15px solid transparent;
-      border-top: 20px solid #ffba08;
-    }
+  // 3. 内部で一度計算された _stopAngle をクリアし、
+  //    computeAnimation() が再度ランダム角度を選ぶようにする
+  theWheel.animation._stopAngle = null;
 
-    /* ボタン等そのほか */
-    #spin {
-      margin: 1rem 0 0;
-      padding: 0.8rem 2rem;
-      font-size: 1.1rem;
-      border: none;
-      border-radius: 6px;
-      background: #ffba08;
-      color: #222;
-    }
-  </style>
-</head>
-<body>
-  <h1>たかやスペシャルのギャグルーレット</h1>
+  // 4. TweenMax の参照もクリアしておく
+  theWheel.tween = null;
 
-  <div id="wheel-container">
-    <canvas id="canvas"></canvas>
-    <div id="pointer"></div>
-  </div>
+  // 5. 再描画してからスピン開始
+  theWheel.draw();
+  theWheel.startAnimation();
+});
+}
 
-  <button id="spin">🎉 回す！</button>
-  <div id="twitch-player"></div>
+/* ★ リサイズ時に再フィット */
+window.addEventListener('resize', fitCanvas);
 
-  <script src="wheel.js"></script>
-</body>
-</html>
+/* ▼ クリップ読み込み ▼ */
+fetch('clips.json')
+  .then(r => {
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    return r.json();
+  })
+  .then(data => {
+    clips = data;
+    initWheel();
+  })
+  .catch(err => console.error('‼ clips.json 読み込み失敗:', err));
+
+/* ▼ クリップ再生関数 ▼ */
+function playClip(label) {
+  const clipObj = clips.find(c => c.label === label);
+  if (!clipObj) return;
+
+  const playerDiv = document.getElementById('twitch-player');
+  playerDiv.innerHTML = '';
+
+  const parent = location.hostname;
+  const url    = `https://clips.twitch.tv/embed?clip=${clipObj.clip}` +
+                 `&autoplay=true&muted=false&parent=${parent}`;
+
+  const iframe = document.createElement('iframe');
+  iframe.src           = url;
+  iframe.allowFullscreen = true;
+  playerDiv.appendChild(iframe);
+}
