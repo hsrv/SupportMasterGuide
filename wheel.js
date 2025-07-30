@@ -3,21 +3,26 @@ let clips = [];
 let theWheel;
 
 /* ★ 端末サイズに合わせてキャンバスを設定する関数 */
-function fitCanvas() {
-  const canvas = document.getElementById('canvas');
-  // CSS 変数 --wheel-size の計算結果を取得
-  const size = parseFloat(getComputedStyle(document.documentElement)
-                .getPropertyValue('--wheel-size'));
-  canvas.width  = size;
-  canvas.height = size;
+ function fitCanvas() {
+   const canvas = document.getElementById('canvas');
 
-  if (theWheel) {
-    // 外周半径を再計算して描画更新
-    theWheel.outerRadius = size / 2 - 10;
-    theWheel.draw();
-  }
-}
+-  // 旧: CSS カスタムプロパティを parseFloat していた
+-  const size = parseFloat(
+-      getComputedStyle(document.documentElement)
+-        .getPropertyValue('--wheel-size')
+-  );
++  // 新: レイアウト後の実際の幅をそのまま取得
++  const size = canvas.getBoundingClientRect().width;
 
+   // Canvas の内部解像度も同じ値に
+   canvas.width  = size;
+   canvas.height = size;
+
+   if (theWheel) {
+     theWheel.outerRadius = size / 2 - 10;
+     theWheel.draw();
+   }
+ }
 function initWheel() {
   fitCanvas(); // ★ 最初に呼ぶ
 
