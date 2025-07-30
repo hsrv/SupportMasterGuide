@@ -54,11 +54,9 @@ function initWheel() {
 
   // ボタンのリスナは一度だけ
   document.getElementById('spin').addEventListener('click', () => {
-	
 	theWheel.stopAnimation(true);
 	theWheel.startAnimation();
 	});
-}
 	
 
 /* ★ リサイズ時に再フィット */
