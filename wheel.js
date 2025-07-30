@@ -56,13 +56,22 @@ function initWheel() {
 
   // スピンボタン
   document.getElementById('spin').addEventListener('click', () => {
-  // 1. 現在のアニメーション停止（コールバックは呼ばない）
+  // 1. 既存アニメーションを止める（コールバックは呼ばない）
   theWheel.stopAnimation(false);
-  // 2. 回転角度をリセット
-  theWheel.rotationAngle = 0;
-  // 3. 再描画
+
+  // 2. 現在の角度を 0–360° に正規化（mod 360）してセット
+  //    これで次回 startAnimation() は 0–360° のどこかからスタート
+  theWheel.rotationAngle = theWheel.rotationAngle % 360;
+
+  // 3. 内部で一度計算された _stopAngle をクリアし、
+  //    computeAnimation() が再度ランダム角度を選ぶようにする
+  theWheel.animation._stopAngle = null;
+
+  // 4. TweenMax の参照もクリアしておく
+  theWheel.tween = null;
+
+  // 5. 再描画してからスピン開始
   theWheel.draw();
-  // 4. スピン開始
   theWheel.startAnimation();
 });
 }
