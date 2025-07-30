@@ -58,12 +58,41 @@
       aspect-ratio: 16 / 9;
       border: 0;
     }
+/* ① ルーレットを包むラッパー */
+#wheel-container {
+  position: relative;
+  width: var(--wheel-size);
+  height: var(--wheel-size);
+  margin: 0 auto;
+}
+
+/* ② ラッパー内の canvas を 100% に */
+#wheel-container canvas {
+  width: 100%;
+  height: 100%;
+}
+
+/* ③ キャンバス上に重ねる三角矢印 */
+#pointer {
+  position: absolute;
+  top: -20px;               /* 矢印の高さ分だけ上へ */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 15px solid transparent;
+  border-right: 15px solid transparent;
+  border-bottom: 20px solid #ffba08; /* 矢印の色 */
+}
   </style>
 </head>
 
 <body>
   <h1>たかやスペシャルのギャグルーレット</h1>
-
+  <div id="wheel-container">
+    <canvas id="canvas"></canvas>
+    <div id="pointer"></div>
+  </div>
   <canvas id="canvas"></canvas>
   <button id="spin">🎉 回す！</button>
 
