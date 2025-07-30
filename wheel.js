@@ -6,13 +6,8 @@ let theWheel;
  function fitCanvas() {
    const canvas = document.getElementById('canvas');
 
--  // 旧: CSS カスタムプロパティを parseFloat していた
--  const size = parseFloat(
--      getComputedStyle(document.documentElement)
--        .getPropertyValue('--wheel-size')
--  );
-+  // 新: レイアウト後の実際の幅をそのまま取得
-+  const size = canvas.getBoundingClientRect().width;
+// 新: レイアウト後の実際の幅をそのまま取得
+   const size = canvas.getBoundingClientRect().width;
 
    // Canvas の内部解像度も同じ値に
    canvas.width  = size;
