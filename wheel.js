@@ -16,13 +16,20 @@ let theWheel;
      theWheel.draw();
    }
  }
+function randomPastelColor() {
+  const hue = Math.floor(Math.random() * 360);     // 0–359°
+  const saturation = 70;                           // 彩度 70%
+  const lightness  = 85;                           // 明度 85% → パステル
+  return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+}
 function initWheel() {
   fitCanvas(); // ★ 最初に呼ぶ
 
-  const segments = clips.map((c, i) => ({
-    text: c.label,
-    fillStyle: i % 2 ? '#ffec99' : '#ffe066'
-  }));
+	const segments = clips.map((c, i) => ({
+	text: c.label,
+	// 各セグメントにランダムなパステルを割り当て
+	fillStyle: randomPastelColor()
+	}));
 
   theWheel = new Winwheel({
     numSegments: segments.length,
