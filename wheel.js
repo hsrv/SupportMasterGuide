@@ -23,33 +23,37 @@ function randomPastelColor() {
   return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
 }
 function initWheel() {
-  fitCanvas(); // ★ 最初に呼ぶ
+  fitCanvas();
 
-	const segments = clips.map((c, i) => ({
-	text: c.label,
-	// 各セグメントにランダムなパステルを割り当て
-	fillStyle: randomPastelColor()
-	}));
+  // 新しい色でセグメント配列を作り直し
+  const segments = clips.map(c => ({
+    text: c.label,
+    fillStyle: randomPastelColor(),
+    textFillStyle: '#333'    // コントラスト用に文字色もお好みで
+  }));
 
+  // もし以前のホイールがあればキャンバスごとクリア
+  const canvas = document.getElementById('canvas');
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // 毎回 fresh なインスタンスを作る
   theWheel = new Winwheel({
+    canvasId:    'canvas',
     numSegments: segments.length,
-    segments: segments,
-    outerRadius: document.getElementById('canvas').width / 2 - 10,
-    textMargin: 0,
+    segments:    segments,
+    outerRadius: canvas.width/2 - 10,
+    textMargin:  0,
     animation: {
-      type: 'spinToStop',
-      duration: 6,
-      spins: 8,
-      callbackFinished: (segment) => playClip(segment.text)
+      type:       'spinToStop',
+      duration:   6,
+      spins:      8,
+      callbackFinished: seg => playClip(seg.text)
     }
   });
 
-	document.getElementById('spin').addEventListener('click', () => {
-	
-	theWheel.stopAnimation(true);
-	theWheel.startAnimation();
-	});
-}
+  // ボタンのリスナは一度だけ
+  document.getElementById('spin').onclick = () => theWheel.startAnimation();
 
 /* ★ リサイズ時に再フィット */
 window.addEventListener('resize', fitCanvas);
