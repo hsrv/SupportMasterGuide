@@ -54,9 +54,20 @@ function initWheel() {
 
   // ボタンのリスナは一度だけ
   document.getElementById('spin').addEventListener('click', () => {
-	theWheel.stopAnimation(true);
-	theWheel.startAnimation();
-	});
+  // 1) 以前のアニメーションを強制停止＋状態クリア
+  theWheel.stopAnimation(true);
+
+  // 2) セグメントの色をランダムパステルに上書き
+  theWheel.segments.forEach(s => {
+    s.fillStyle = randomPastelColor();
+  });
+
+  // 3) 再描画して新色をキャンバスに反映
+  theWheel.draw();
+
+  // 4) 改めてフルスピン
+  theWheel.startAnimation();
+});
 	
 
 /* ★ リサイズ時に再フィット */
