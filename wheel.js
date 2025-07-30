@@ -56,10 +56,15 @@ function initWheel() {
 
   // スピンボタン
   document.getElementById('spin').addEventListener('click', () => {
-    theWheel.stopAnimation(true);
-    theWheel.draw();
-    theWheel.startAnimation();
-  });
+  // 1. 現在のアニメーション停止（コールバックは呼ばない）
+  theWheel.stopAnimation(false);
+  // 2. 回転角度をリセット
+  theWheel.rotationAngle = 0;
+  // 3. 再描画
+  theWheel.draw();
+  // 4. スピン開始
+  theWheel.startAnimation();
+});
 }
 
 /* ★ リサイズ時に再フィット */
