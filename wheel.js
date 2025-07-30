@@ -3,75 +3,81 @@ let clips = [];
 let theWheel;
 
 /* ★ 端末サイズに合わせてキャンバスを設定する関数 */
- function fitCanvas() {
-   const canvas = document.getElementById('canvas');
-   const size = canvas.getBoundingClientRect().width;
+function fitCanvas() {
+  const canvas = document.getElementById('canvas');
+  const size   = canvas.getBoundingClientRect().width;
+  canvas.width  = size;
+  canvas.height = size;
 
-   // Canvas の内部解像度も同じ値に
-   canvas.width  = size;
-   canvas.height = size;
+  if (theWheel) {
+    theWheel.outerRadius = size / 2 - 10;
+    theWheel.draw();
+  }
+}
 
-   if (theWheel) {
-     theWheel.outerRadius = size / 2 - 10;
-     theWheel.draw();
-   }
- }
 function randomPastelColor() {
-  const hue = Math.floor(Math.random() * 360);     // 0–359°
-  const saturation = 70;                           // 彩度 70%
-  const lightness  = 85;                           // 明度 85% → パステル
+  const hue        = Math.floor(Math.random() * 360);  // 0–359°
+  const saturation = 70;                               // 彩度 70%
+  const lightness  = 85;                               // 明度 85% → パステル
   return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
 }
+
 function initWheel() {
   fitCanvas();
 
-  // 新しい色でセグメント配列を作り直し
+  // ランダムパステルでセグメント配列を再作成
   const segments = clips.map(c => ({
-    text: c.label,
-    fillStyle: randomPastelColor(),
-    textFillStyle: '#333'    // コントラスト用に文字色もお好みで
+    text:           c.label,
+    fillStyle:      randomPastelColor(),
+    textFillStyle:  '#333'
   }));
 
-  // もし以前のホイールがあればキャンバスごとクリア
+  // キャンバスをクリア
   const canvas = document.getElementById('canvas');
-  const ctx = canvas.getContext('2d');
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
 
-  // 毎回 fresh なインスタンスを作る
+  // 新しい Winwheel インスタンス
   theWheel = new Winwheel({
     canvasId:    'canvas',
     numSegments: segments.length,
     segments:    segments,
-    outerRadius: canvas.width/2 - 10,
+    outerRadius: canvas.width / 2 - 10,
     textMargin:  0,
     animation: {
-      type:       'spinToStop',
-      duration:   6,
-      spins:      8,
+      type:             'spinToStop',
+      duration:         6,
+      spins:            8,
       callbackFinished: seg => playClip(seg.text)
     }
   });
 
-  // ボタンのリスナは一度だけ
+  // 最初に一度描画
+  theWheel.draw();
+
+  // スピンボタン
   document.getElementById('spin').addEventListener('click', () => {
-	theWheel.stopAnimation(true);
-	theWheel.draw();
-	theWheel.startAnimation();
-	});
+    theWheel.stopAnimation(true);
+    theWheel.draw();
+    theWheel.startAnimation();
+  });
 }
 
 /* ★ リサイズ時に再フィット */
 window.addEventListener('resize', fitCanvas);
 
-/* ▼ 以下は元のまま ▼ */
+/* ▼ クリップ読み込み ▼ */
 fetch('clips.json')
   .then(r => {
     if (!r.ok) throw new Error('HTTP ' + r.status);
     return r.json();
   })
-  .then(data => { clips = data; initWheel(); })
+  .then(data => {
+    clips = data;
+    initWheel();
+  })
   .catch(err => console.error('‼ clips.json 読み込み失敗:', err));
 
+/* ▼ クリップ再生関数 ▼ */
 function playClip(label) {
   const clipObj = clips.find(c => c.label === label);
   if (!clipObj) return;
@@ -80,10 +86,11 @@ function playClip(label) {
   playerDiv.innerHTML = '';
 
   const parent = location.hostname;
-  const url = `https://clips.twitch.tv/embed?clip=${clipObj.clip}&autoplay=true&muted=false&parent=${parent}`;
+  const url    = `https://clips.twitch.tv/embed?clip=${clipObj.clip}` +
+                 `&autoplay=true&muted=false&parent=${parent}`;
 
   const iframe = document.createElement('iframe');
-  iframe.src = url;
+  iframe.src           = url;
   iframe.allowFullscreen = true;
   playerDiv.appendChild(iframe);
 }
