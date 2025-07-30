@@ -53,8 +53,12 @@ window.addEventListener('resize', fitCanvas);
 
 /* ▼ 以下は元のまま ▼ */
 fetch('clips.json')
-  .then(r => r.json())
-  .then(data => { clips = data; initWheel(); });
+  .then(r => {
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    return r.json();
+  })
+  .then(data => { clips = data; initWheel(); })
+  .catch(err => console.error('‼ clips.json 読み込み失敗:', err));
 
 function playClip(label) {
   const clipObj = clips.find(c => c.label === label);
