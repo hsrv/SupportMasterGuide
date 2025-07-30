@@ -58,33 +58,34 @@
       aspect-ratio: 16 / 9;
       border: 0;
     }
-/* ① ルーレットを包むラッパー */
+/* ルーレットを包むラッパー */
 #wheel-container {
   position: relative;
   width: var(--wheel-size);
   height: var(--wheel-size);
   margin: 0 auto;
+  overflow: visible;     /* 矢印が上にはみ出すのを許可 */
 }
 
-/* ② ラッパー内の canvas を 100% に */
+/* ラッパー内の canvas を 100% に */
 #wheel-container canvas {
   width: 100%;
   height: 100%;
 }
 
-/* ③ キャンバス上に重ねる三角矢印 */
+/* キャンバス上に重ねる三角矢印 */
 #pointer {
   position: absolute;
-  top: -20px;               /* 矢印の高さ分だけ上へ */
+  z-index: 10;           /* Canvas の上に出す */
+  top: -20px;            /* 矢印の高さ分だけ上へ */
   left: 50%;
   transform: translateX(-50%);
   width: 0;
   height: 0;
   border-left: 15px solid transparent;
   border-right: 15px solid transparent;
-  border-bottom: 20px solid #ffba08; /* 矢印の色 */
-}
-  </style>
+  border-bottom: 20px solid #ffba08;
+}  </style>
 </head>
 
 <body>
