@@ -3,42 +3,32 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>たかやスペシャルのギャグルーレット</title>
-
-  <!-- ライブラリ -->
+  <title>ルーレット</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/2.1.3/TweenMax.min.js"></script>
   <script src="Winwheel.min.js"></script>
-
   <style>
     :root {
       --wheel-max: 400px;
       --wheel-size: min(var(--wheel-max), 90vw);
     }
     body {
-      margin: 0;
-      padding: 0 1rem;
-      background: #222;
-      color: #fff;
-      text-align: center;
-      font-family: system-ui, sans-serif;
-    }
-    h1 {
-      font-size: clamp(1.3rem, 5vw, 1.8rem);
-      margin: 1rem 0;
+      margin: 0; padding: 0 1rem;
+      background: #222; color: #fff;
+      text-align: center; font-family: system-ui, sans-serif;
     }
 
-    /* ★ ここから追加・修正部分 ★ */
+    /* ↓ 古い #canvas {…} は完全に削除 or コメントアウト */
 
-    /* ルーレットを包むラッパー */
+    /* ① ルーレットを包むラッパー */
     #wheel-container {
       position: relative;
       width: var(--wheel-size);
       height: var(--wheel-size);
       margin: 0 auto;
-      overflow: visible;         /* 矢印をはみ出させる */
+      overflow: visible;
     }
 
-    /* ラッパー内の canvas — ここで背景丸を１つだけ設定 */
+    /* ② ラッパー内の canvas */
     #wheel-container canvas {
       width: 100%;
       height: 100%;
@@ -47,20 +37,20 @@
       display: block;
     }
 
-    /* 下向き三角矢印 */
+    /* ③ 矢印（下向き） */
     #pointer {
       position: absolute;
       z-index: 10;
-      bottom: -20px;             /* ホイール下にはみ出す分 */
+      bottom: -20px;
       left: 50%;
       transform: translateX(-50%);
-      width: 0;
-      height: 0;
+      width: 0; height: 0;
       border-left: 15px solid transparent;
       border-right: 15px solid transparent;
       border-top: 20px solid #ffba08;
     }
 
+    /* ボタン等そのほか */
     #spin {
       margin: 1rem 0 0;
       padding: 0.8rem 2rem;
@@ -70,17 +60,6 @@
       background: #ffba08;
       color: #222;
     }
-    #twitch-player {
-      margin-top: 1.5rem;
-    }
-    #twitch-player iframe {
-      width: 100%;
-      max-width: 640px;
-      aspect-ratio: 16/9;
-      border: 0;
-    }
-    /* ★ ここまで追加・修正部分 ★ */
-
   </style>
 </head>
 <body>
@@ -94,7 +73,6 @@
   <button id="spin">🎉 回す！</button>
   <div id="twitch-player"></div>
 
-  <!-- 必ず最後に -->
   <script src="wheel.js"></script>
 </body>
 </html>
